@@ -1,6 +1,8 @@
 #ifndef BALLVIEWPORT_H
 #define BALLVIEWPORT_H
 
+#define GL_SILENCE_DEPRECATION
+
 #include <QOpenGLWidget>
 #include <QOpenGLFunctions>
 
@@ -18,8 +20,18 @@ protected:
 
 private:
     GLuint m_shaderProgram = 0;
-    GLuint m_vao = 0;
-    GLuint m_vbo = 0;
+
+    // For the bounding box
+    GLuint m_boxVao = 0;
+    GLuint m_boxVbo = 0;
+
+    // For the spheres
+    GLuint m_sphereVao = 0;
+    GLuint m_sphereVbo = 0;
+    GLuint m_sphereEbo = 0;
+    int m_sphereIndexCount = 0;
+
+
 };
 
 #endif
