@@ -1,3 +1,4 @@
+#include <QMatrix4x4>
 #include "ballviewport.h"
 
 BallViewport::BallViewport(QWidget *parent)
@@ -18,8 +19,9 @@ void BallViewport::initializeGL()
     static const char *vertexShaderSource =
         "#version 410 core\n"
         "layout(location = 0) in vec3 aPos;\n"
+        "uniform mat4 uMVP;\n"
         "void main() {\n"
-        "   gl_Position = vec4(aPos, 1.0);\n"
+        "   gl_Position = uMVP * vec4(aPos, 1.0);\n"
         "}";
 
     static const char *fragmentShaderSource =
@@ -223,6 +225,29 @@ void BallViewport::paintGL()
 
     glUseProgram(m_shaderProgram);
 
+
+    // Set up our MVP
+
+    QMatrix4x4 model;
+    model.setToIdentity();
+
+    QMatrix4x4 view;
+    view.setToIdentity();
+    view.translate(0.0f, 0.0f, -3.0f);
+
+    QMatrix4x4 projection;
+    projection.setToIdentity();
+
+    float aspect = static_cast<float>(width()) / static_cast<float>(height());
+    projection.perspective(45.0f, aspect, 0.1f, 100.0f);
+
+    QMatrix4x4 mvp = projection * view * model;
+
+    GLint mvpLocation = glGetUniformLocation(m_shaderProgram, "uMVP");
+    glUniformMatrix4fv(mvpLocation, 1, GL_FALSE, mvp.constData());
+
+
+    // Draw calls
 
     glBindVertexArray(m_boxVao);
     glDrawArrays(GL_LINES, 0, 24);
